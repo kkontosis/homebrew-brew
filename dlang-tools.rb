@@ -1,8 +1,9 @@
 class DlangTools < Formula
   desc "D programming language tools"
   homepage "https://dlang.org/"
+  head "https://github.com/dlang/tools.git"
   url "https://github.com/dlang/tools/archive/master.tar.gz"
-
+  version "1.0"
 
   depends_on "automake"
   depends_on "dmd"
