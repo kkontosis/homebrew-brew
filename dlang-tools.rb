@@ -8,8 +8,8 @@ class DlangTools < Formula
   depends_on "dub"
 
   def install
-    system "make" "-f" "posix.mak" "all"
-    system "make" "-f" "posix.mak" "install"
+    system "make" "-f" "posix.mak" "all" "INSTALL_DIR=#{prefix}"
+    system "make" "-f" "posix.mak" "install" "INSTALL_DIR=#{prefix}"
 
     # inreplace "fluidsynth/Makefile", "lv2-plugin", "lv2"
 
