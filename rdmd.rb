@@ -15,14 +15,14 @@ class Rdmd < Formula
 
   def install
     system "make", "-f", "posix.mak", "rdmd", "DMD=dmd", "INSTALL_DIR=#{prefix}"
-    system "make", "-f", "posix.mak", "install", "DMD=dmd", "INSTALL_DIR=#{prefix}"
+    # system "make", "-f", "posix.mak", "install", "DMD=dmd", "INSTALL_DIR=#{prefix}"
+    system "cp", "generated/*/*/rdmd", "#{prefix}/bin"
+  end
 
-    end
+  test do
+    system "rdmd"
+    system "which", "rdmd"
 
-    test do
-      system "rdmd"
-      system "which", "rdmd"
-
-    end
+  end
 end
 
