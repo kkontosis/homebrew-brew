@@ -18,7 +18,7 @@ class Rdmd < Formula
     # system "make", "-f", "posix.mak", "install", "DMD=dmd", "INSTALL_DIR=#{prefix}"
 
     system "bash", "-c", "cp generated/*/*/rdmd ."
-    system "cp", "./rdmd" "#{prefix}/bin"
+    system "cp", "./rdmd", "#{prefix}/bin"
   end
 
   test do
