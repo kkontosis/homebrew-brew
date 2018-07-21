@@ -1,4 +1,9 @@
 language: ruby
 os: osx
+
 script:
-- ./osx
+- brew update
+- brew install `find *.rb`
+- brew test `find *.rb`
+
+
