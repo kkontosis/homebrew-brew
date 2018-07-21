@@ -15,9 +15,12 @@ class Rdmd < Formula
 
   def install
     system "make", "-f", "posix.mak", "rdmd", "DMD=dmd", "INSTALL_DIR=#{prefix}"
+
+    # make install, will make everything but we want just rdmd
     # system "make", "-f", "posix.mak", "install", "DMD=dmd", "INSTALL_DIR=#{prefix}"
 
     system "bash", "-c", "cp generated/*/*/rdmd ."
+    system "mkdir", "-p", "#{prefix}/bin"
     system "cp", "./rdmd", "#{prefix}/bin"
   end
 
