@@ -1,7 +1,8 @@
 class DlangTools < Formula
   desc "D programming language tools"
   homepage "https://dlang.org/"
-  head "https://github.com/dlang/tools.git"
+  url "https://github.com/dlang/tools/archive/master.tar.gz"
+
 
   depends_on "automake"
   depends_on "dmd"
@@ -11,12 +12,6 @@ class DlangTools < Formula
     system "make" "-f" "posix.mak" "all" "INSTALL_DIR=#{prefix}"
     system "make" "-f" "posix.mak" "install" "INSTALL_DIR=#{prefix}"
 
-    # inreplace "fluidsynth/Makefile", "lv2-plugin", "lv2"
-
-    # ["fluidsynth", "pitchdetect", "shimmer", "amp_with_gui"].each do |plugin| # "visual_compressor" needs lv2-c++-tools
-    #   cd "#{buildpath}/#{plugin}" do
-    #     system "make", "install", "INSTALL_DIR=#{lib}/lv2"
-    #   end
     end
 
     test do
