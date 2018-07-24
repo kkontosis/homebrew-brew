@@ -1,0 +1,132 @@
+diff --git a/gcc/d/dfrontend/constfold.c b/gcc/d/dfrontend/constfold.c
+index 9c4fdd0b..9dc670ec 100644
+--- a/gcc/d/dfrontend/constfold.c
++++ b/gcc/d/dfrontend/constfold.c
+@@ -1164,18 +1164,18 @@ L1:
+             switch (typeb->ty)
+             {
+                 case Tint8:
+-                    result = (d_int8)(sinteger_t)r;
++                    result = (d_int8)(int64_t)r;
+                     break;
+                 case Tchar:
+                 case Tuns8:
+-                    result = (d_uns8)(dinteger_t)r;
++                    result = (d_uns8)(uint64_t)r;
+                     break;
+                 case Tint16:
+-                    result = (d_int16)(sinteger_t)r;
++                    result = (d_int16)(int64_t)r;
+                     break;
+                 case Twchar:
+                 case Tuns16:
+-                    result = (d_uns16)(dinteger_t)r;
++                    result = (d_uns16)(uint64_t)r;
+                     break;
+                 case Tint32:
+                     result = (d_int32)r;
+diff --git a/gcc/d/dfrontend/dcast.c b/gcc/d/dfrontend/dcast.c
+index d313effe..2057d94d 100644
+--- a/gcc/d/dfrontend/dcast.c
++++ b/gcc/d/dfrontend/dcast.c
+@@ -451,8 +451,8 @@ MATCH implicitConvTo(Expression *e, Type *t)
+                     }
+                     else
+                     {
+-                        f = (double)(sinteger_t)value;
+-                        if (f != (sinteger_t)value)
++                        f = (double)(int64_t)value;
++                        if (f != (int64_t)value)
+                             return;
+                     }
+                     break;
+@@ -463,14 +463,14 @@ MATCH implicitConvTo(Expression *e, Type *t)
+                     volatile_longdouble f;
+                     if (e->type->isunsigned())
+                     {
+-                        f = ldouble(value);
+-                        if ((dinteger_t)f != value) // isn't this a noop, because the compiler prefers ld
++                        f = ldouble((uint64_t)value);
++                        if ((uint64_t)f != value) // isn't this a noop, because the compiler prefers ld
+                             return;
+                     }
+                     else
+                     {
+-                        f = ldouble((sinteger_t)value);
+-                        if ((sinteger_t)f != (sinteger_t)value)
++                        f = ldouble((int64_t)value);
++                        if ((int64_t)f != (int64_t)value)
+                             return;
+                     }
+                     break;
+diff --git a/gcc/d/dfrontend/expression.c b/gcc/d/dfrontend/expression.c
+index ec92830a..8e1d28ae 100644
+--- a/gcc/d/dfrontend/expression.c
++++ b/gcc/d/dfrontend/expression.c
+@@ -3037,12 +3037,12 @@ RealExp *RealExp::create(Loc loc, real_t value, Type *type)
+ 
+ dinteger_t RealExp::toInteger()
+ {
+-    return (sinteger_t) toReal();
++    return (int64_t) toReal();
+ }
+ 
+ uinteger_t RealExp::toUInteger()
+ {
+-    return (uinteger_t) toReal();
++    return (uint64_t) toReal();
+ }
+ 
+ real_t RealExp::toReal()
+@@ -3109,12 +3109,12 @@ ComplexExp *ComplexExp::create(Loc loc, complex_t value, Type *type)
+ 
+ dinteger_t ComplexExp::toInteger()
+ {
+-    return (sinteger_t) toReal();
++    return (int64_t) toReal();
+ }
+ 
+ uinteger_t ComplexExp::toUInteger()
+ {
+-    return (uinteger_t) toReal();
++    return (uint64_t) toReal();
+ }
+ 
+ real_t ComplexExp::toReal()
+diff --git a/gcc/d/dfrontend/expressionsem.c b/gcc/d/dfrontend/expressionsem.c
+index c1da6de5..99d1c9a0 100644
+--- a/gcc/d/dfrontend/expressionsem.c
++++ b/gcc/d/dfrontend/expressionsem.c
+@@ -7244,8 +7244,8 @@ public:
+         sinteger_t intpow = 0;
+         if (exp->e2->op == TOKint64 && ((sinteger_t)exp->e2->toInteger() == 2 || (sinteger_t)exp->e2->toInteger() == 3))
+             intpow = exp->e2->toInteger();
+-        else if (exp->e2->op == TOKfloat64 && (exp->e2->toReal() == ldouble((sinteger_t)exp->e2->toReal())))
+-            intpow = (sinteger_t)(exp->e2->toReal());
++        else if (exp->e2->op == TOKfloat64 && (exp->e2->toReal() == ldouble((int64_t)exp->e2->toReal())))
++            intpow = (int64_t)(exp->e2->toReal());
+ 
+         // Deal with x^^2, x^^3 immediately, since they are of practical importance.
+         if (intpow == 2 || intpow == 3)
+diff --git a/gcc/d/dfrontend/optimize.c b/gcc/d/dfrontend/optimize.c
+index 0c9e6494..38252194 100644
+--- a/gcc/d/dfrontend/optimize.c
++++ b/gcc/d/dfrontend/optimize.c
+@@ -882,7 +882,7 @@ Expression *Expression_optimize(Expression *e, int result, bool keepLvalue)
+             }
+ 
+             // All other negative integral powers are illegal
+-            if ((e->e1->type->isintegral()) && (e->e2->op == TOKint64) && (sinteger_t)e->e2->toInteger() < 0)
++            if ((e->e1->type->isintegral()) && (e->e2->op == TOKint64) && (int64_t)e->e2->toInteger() < 0)
+             {
+                 e->error("cannot raise %s to a negative integer power. Did you mean (cast(real)%s)^^%s ?",
+                       e->e1->type->toBasetype()->toChars(), e->e1->toChars(), e->e2->toChars());
+@@ -890,7 +890,7 @@ Expression *Expression_optimize(Expression *e, int result, bool keepLvalue)
+             }
+ 
+             // If e2 *could* have been an integer, make it one.
+-            if (e->e2->op == TOKfloat64 && (e->e2->toReal() == ldouble((sinteger_t)e->e2->toReal())))
++            if (e->e2->op == TOKfloat64 && (e->e2->toReal() == ldouble((int64_t)e->e2->toReal())))
+                 e->e2 = new IntegerExp(e->loc, e->e2->toInteger(), Type::tint64);
+ 
+             if (e->e1->isConst() == 1 && e->e2->isConst() == 1)
