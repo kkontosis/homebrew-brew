@@ -14,7 +14,9 @@ class Rdmd < Formula
 
   def install
 
-    system "bash", "-c", "test -f /usr/local/bin/rdmd || ln -s /usr/local/Cellar/dmd/2.*/bin/rdmd /usr/local/bin/rdmd"
+    # system "bash", "-c", "test -f /usr/local/bin/rdmd || ln -s /usr/local/Cellar/dmd/2.*/bin/rdmd /usr/local/bin/rdmd"
+    system "mkdir", "bin"
+    system "bash", "-c", "test -f /usr/local/bin/rdmd || cp /usr/local/Cellar/dmd/2.*/bin/rdmd bin/"
 
   end
 
