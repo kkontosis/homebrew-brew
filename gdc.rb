@@ -44,17 +44,19 @@ class Gdc < Formula
   end
 
   def install
+    # Move gcc to a subdirectory named gcc
+    system "mkdir", "._gcc-temp"
+    system "bash", "-c", "mv * .[a-zA-Z]* ._gcc-temp"
+    system "mv", "._gcc-temp", "gcc"
+
+    # Download gdc to a subdirectory named gdc
+    system "git", "clone", "https://github.com/D-Programming-GDC/GDC.git", "gdc"
+
     # First we will patch gcc to become gdc (awesome!)
     # ...
-    system "mkdir", "gdc-source"
-    system "cd", "gdc-source"
-    system "git", "clone", "https://github.com/D-Programming-GDC/GDC.git", "."
-    system "git", "checkout", "gdc-8"
-    system "./setup-gcc.sh", ".."
-    system "cd", ".."
+    system "bash", "-c", "cd gdc && git checkout gdc-8 ; cd .."
+    system "bash", "-c", "cd gdc && ./setup-gcc.sh ../gcc ; cd .."
     # ...
-
-
 
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
@@ -70,10 +72,7 @@ class Gdc < Formula
       "--disable-multilib",
       "--disable-libgomp",
       "--disable-libmudflap",
-      "--disable-libquadmath"
-
-
-
+      "--disable-libquadmath",
       # Make most executables versioned to avoid conflicts.
       "--program-suffix=-#{version_suffix}",
       "--with-gmp=#{Formula["gmp"].opt_prefix}",
@@ -91,7 +90,7 @@ class Gdc < Formula
 
     # Ensure correct install names when linking against libgcc_s;
     # see discussion in https://github.com/Homebrew/homebrew/pull/34303
-    inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
+    inreplace "gcc/libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gdc/#{version_suffix}"
 
     mkdir "build" do
       unless MacOS::CLT.installed?
@@ -101,7 +100,9 @@ class Gdc < Formula
         args << "--with-sysroot=#{MacOS.sdk_path}"
       end
 
-      system "../configure", *args
+      system "pwd"
+      system "ls -l .."
+      system "../gcc/configure", *args
 
       make_args = []
       # Use -headerpad_max_install_names in the build,
