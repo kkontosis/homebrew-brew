@@ -24,7 +24,7 @@ class Rdmd < Formula
     system "cp", "./rdmd", "#{prefix}/bin"
 
     # do not use it if it is already linked
-    system "bash", "-c", "test -f /usr/local/bin/rdmd && rm #{prefix}/bin/ || echo ok"
+    system "bash", "-c", "test -f /usr/local/bin/rdmd && rm #{prefix}/bin/rdmd || echo ok"
 
   end
 
