@@ -14,5 +14,9 @@ class DubConfig < Formula
     system "mkdir", "-p", "#{prefix}/bin"
     system "cp", "./dub-config", "#{prefix}/bin"
   end
+
+  test do
+    system "which", "dub-config"
+  end
 end
 
